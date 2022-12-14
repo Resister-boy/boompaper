@@ -2,6 +2,7 @@
 pragma solidity 0.8.9; 
 
 //import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+// TODO ERC721 대신에 ERC721URIStorage 를 쓰는 이유는 _setTokenURI 를 쓰기 위함
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
@@ -12,10 +13,16 @@ import "hardhat/console.sol";
 // PaperManager 가 생성하는 NFT 이다.
 // 그리고 minting 하는 것은 Comment Message 이다.
 contract Paper is ERC721URIStorage {
+    // using Strings for uint256 를 왜 쓰는가?
+    // https://forum.openzeppelin.com/t/what-does-this-mean-using-strings-for-uint256-in-erc721-contracts/7964
+    // This is to say, an uint256 variable can call up functions in the Strings library. 
+    // One example can be, value.toString(). 
+    // An uint256 can be easily converted into a string. How convenient.
     using Strings for uint256;
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
+    // 아래 3개는 하려고 했지만 구현하지 않음.
     // TODO 초대 address 
     //address[] inviteAddresses;
     // TODO 허용 address 
@@ -23,9 +30,8 @@ contract Paper is ERC721URIStorage {
     // TODO 블럭 address
     //address[] denyAddresses;
 
-    // address s_contractAddress;
-
     // owner 는 paper 생성자 
+    // title,name 을 정해줘야 함.
     constructor(string memory title,string memory name) ERC721(title, name) {
     }
 
@@ -38,12 +44,14 @@ contract Paper is ERC721URIStorage {
         return _tokenIds.current();
     }
     
+    // 
     struct PaperNFTItem {
         uint256 tokenId;
         string tokenURI;
     }
 
-    // Paper에 속한 모든 NFT 를 가져온다.
+    /// Paper에 속한 모든 NFT 를 가져온다.
+    // 모두 가져오는 좀 무식한 API 임.
     function getAllTokenURI() public view returns (PaperNFTItem[] memory) {
         uint256 itemsCount = _tokenIds.current();
         PaperNFTItem[] memory items = new PaperNFTItem[](itemsCount);
@@ -57,15 +65,14 @@ contract Paper is ERC721URIStorage {
     }
 
     /// tokenURI payload를 받아서 그냥 넣는다.
-    /// TODO payable을 해야 할 듯?
+    // TODO 민트하는데 돈 들게 하려면, payable을 해야 할 듯? 
     event EvMintTokenSuccess(uint256 tokenId);
     function mintToken(string memory tokenURI) public returns (uint256) {
         _tokenIds.increment();
         uint256 newItemId = _tokenIds.current();
         _mint(msg.sender, newItemId);
         _setTokenURI(newItemId, tokenURI);
-        //setApprovalForAll(s_contractAddress, true);
-
+        
         emit EvMintTokenSuccess(newItemId);
         return newItemId;
     }
@@ -77,8 +84,7 @@ contract Paper is ERC721URIStorage {
         uint256 newItemId = _tokenIds.current();
         _mint(_mintTo, newItemId);
         _setTokenURI(newItemId, tokenURI);
-        //setApprovalForAll(s_contractAddress, true);
-
+        
         emit EvMintTokenToSuccess(newItemId);
         return newItemId;
     }

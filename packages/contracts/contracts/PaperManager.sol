@@ -1,16 +1,14 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity 0.8.9; 
 
-//import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-//import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-//import "@openzeppelin/contracts/utils/Base64.sol";
 
 import "hardhat/console.sol";
 import "./Paper.sol";
 
+/// 에러메시지들
 error PaperManager__RegistrationFee(uint256 required, string message);
 error PaperManager__SetRegistrationFee(string message);
 error PaperManager__ItemId(string message);
@@ -31,11 +29,13 @@ contract PaperManager is ReentrancyGuard {
     Counters.Counter private _paperItemIds;
     Counters.Counter private _itemsClosed;
 
-    // 생성한 관리자 계정
+    /// 생성한 관리자 계정
     address payable private _owner;
-    // Paper 등록 수수료
+    /// Paper 등록 수수료
     uint256 private _regFree;
 
+    /// 관리하는 내용
+    // TODO 관리하고자 하는 내용을 더 많이 사용하려면 어떻게 해야 하는가?
     struct PaperItem {
         uint256 itemId;
         address nftContract;
@@ -51,28 +51,21 @@ contract PaperManager is ReentrancyGuard {
         bool closed;
     }
 
-    // Paper NFT 들이 갖고 있는 tokenURI 를 리턴해주기 위해서
-    // struct CommentItem {
-    //     uint256 itemId;
-    //     address owner;
-    //     string memory tokenURI;
-    // }
-
     mapping(uint256 => PaperItem) private _paperItems;
 
     constructor() {
         _owner = payable(msg.sender);
         // 등록 수수료 설정 
-        // todo MATIC 에서도 이 단위로 쓰나?
+        // MATIC 에서도 이 단위로 쓴다.
         _regFree = 0.001 ether; 
     }
 
     // 이걸 통해서 생성하지 않은 Paper 는 관리되지 않는다.
     // PaperManager 만 new 할 수 있으면 좋겠는데, 방법이 찾으면 있을 듯?
+    // TODO payable
     //function createPaperItem(string memory title,string memory name) public payable nonReentrant {
     function createPaperItem(string memory pTitle,string memory pSymbolName,string memory pOwnerName) public nonReentrant {
-        // todo 테스트 중에는 끈다.
-        // todo #ifdef 없나?
+        // TODO 테스트 중에는 끈다. #ifdef 없나?
         // if (msg.value < _regFree)
         //     revert PaperManager__RegistrationFee({
         //         required: _regFree,
@@ -157,8 +150,11 @@ contract PaperManager is ReentrancyGuard {
         return items;
     }
 
+    /// 특정 오너가 가진 것들만 가져오기
+    /// 전체를 iteration 해서 filtering 한다. 
     function getPaperItemsByOwner() public view returns (PaperItem[] memory) {
         uint256 totalItemsCount = _paperItemIds.current();
+        // 미리 세어 놓은 다음에 ㅎ 
         uint256 itemCount = countOwnersPaperItems(totalItemsCount);
         uint256 currentIndex = 0;
         PaperItem[] memory items = new PaperItem[](itemCount);
@@ -213,6 +209,8 @@ contract PaperManager is ReentrancyGuard {
         return unclosedItemsCount;
     }
 
+    // pagination 을 위해서 offset , limit 을 받는다.
+    // close 는 닫힌 아이템을 무시하기 위해서 사용한다.
     function fetchPaperItems(
         uint256 offset,
         uint256 limit,

@@ -1,7 +1,6 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity 0.8.9; 
 
-//import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
@@ -14,12 +13,6 @@ contract PaperNFT is ERC721URIStorage {
     using Strings for uint256;
     using Counters for Counters.Counter;
     Counters.Counter private s_tokenIds;
-
-    // address s_contractAddress;
-
-    // constructor(address _contractAddress) ERC721("Boom Paper NFT", "BPN") {
-    //     s_contractAddress = _contractAddress;
-    // }
 
     // owner 는 paper 생성자 
     constructor() ERC721("Boom Paper NFT", "BPN") {
