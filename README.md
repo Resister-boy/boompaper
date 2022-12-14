@@ -11,6 +11,8 @@
 
 ## Getting Started
 
+* yarn 과 npm 을 함께 써도 된다.
+  
 ### 1. run with yarn workspace
 
 * yarn workspace 를 이용하여 관리 및 실행 하기
@@ -31,6 +33,17 @@ yarn workspaces list
 ```
 
 ### 2. compile and deploy contracts pacakge
+
+* contracts
+
+```bash
+cd packages/contracts
+npm install
+npx hardhat compile
+npx hardhat test
+npx hardhat run scripts/deploy.ts
+npx hardhat run scripts/mint_nft_storage.ts
+```
 
 * [README](packages/contracts/README.md)
 
