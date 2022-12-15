@@ -1,6 +1,4 @@
 import { createContext } from 'react';
-import { Contract } from 'ethers';
-
 import { IAppContext } from "../interfaces";
 
 
@@ -12,18 +10,19 @@ export const contextDefaultValues: IAppContext = {
     web3Provider: undefined,
     signerAddr : undefined,
     signer : undefined,
-
     paperManagerContract : null,
     paperContract : null,
-
     paperId : 0,
-    setPaperId : (paperId : number) => {},
-
+    setPaperId : (paperId : number) => {
+        return paperId
+    },
     paperNFTId : 0,
-    setPaperNFTId : (paperNFTId : number) => {},
-
-    connectWallet() {},
-    //setPaperContract(paperContract:Contract) {} : void,
+    setPaperNFTId : (paperNFTId : number) => {
+        return paperNFTId
+    },
+    connectWallet() {
+        return ;
+    }
 };
 
 export const AppContext = 
